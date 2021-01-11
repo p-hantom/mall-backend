@@ -11,6 +11,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "mmall_product")
 public class Product implements Serializable {
@@ -50,9 +53,11 @@ public class Product implements Serializable {
     private Integer status;
 
 	@Column(name = "create_time")
+	@CreationTimestamp
     private Date createTime;
 
 	@Column(name = "update_time")
+	@UpdateTimestamp
     private Date updateTime;
 
     public Product(Integer id, Integer categoryId, String name, String subtitle, String mainImage, String subImages, String detail, BigDecimal price, Integer stock, Integer status, Date createTime, Date updateTime) {
