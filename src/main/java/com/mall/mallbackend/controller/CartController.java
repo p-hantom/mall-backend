@@ -139,6 +139,8 @@ public class CartController {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录,请登录管理员");
         }
         Integer userId = user.getId();
+        System.out.println("userId: "+userId);
+        System.out.println("productId: "+productId);
         
         //Illegal argument
         if(productId == null) {
@@ -148,6 +150,7 @@ public class CartController {
         Optional<Cart> optionalCart = carts.findByUserIdAndProductId(userId, productId);
         if(!optionalCart.isEmpty()) {
         	Cart cart = optionalCart.get();
+        	System.out.println("select cart: "+cart.getId());
         	cart.setChecked(Const.Cart.CHECKED);
         	carts.save(cart);
         }
@@ -171,6 +174,7 @@ public class CartController {
         Optional<Cart> optionalCart = carts.findByUserIdAndProductId(userId, productId);
         if(!optionalCart.isEmpty()) {
         	Cart cart = optionalCart.get();
+        	System.out.println("unselect cart: "+cart.getId());
         	cart.setChecked(Const.Cart.UN_CHECKED);
         	carts.save(cart);
         }

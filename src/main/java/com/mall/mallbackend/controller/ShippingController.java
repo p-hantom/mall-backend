@@ -1,6 +1,7 @@
 package com.mall.mallbackend.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -39,4 +40,14 @@ public class ShippingController {
         }
         return ServerResponse.createByErrorMessage("新建地址失败");
     }
+	
+	@PostMapping(path="/list.do")
+	public ServerResponse<List<Shipping> > list(HttpSession session) {
+		User user = (User)session.getAttribute(Const.CURRENT_USER);
+        if(user ==null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+        }
+        List<Shipping> shippingList = shippings.findAllByUserId(user.getId());
+        return ServerResponse.createBySuccess(shippingList);
+	}
 }

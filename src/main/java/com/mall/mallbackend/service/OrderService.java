@@ -22,6 +22,7 @@ import com.mall.mallbackend.repository.ProductRepository;
 import com.mall.mallbackend.repository.ShippingRepository;
 import com.mall.mallbackend.util.BigDecimalUtil;
 import com.mall.mallbackend.util.DateTimeUtil;
+import com.mall.mallbackend.util.PropertiesUtil;
 import com.mall.mallbackend.vo.OrderItemVo;
 import com.mall.mallbackend.vo.OrderVo;
 import com.mall.mallbackend.vo.ShippingVo;
@@ -133,8 +134,10 @@ public class OrderService {
         orderVo.setStatusDesc(Const.OrderStatusEnum.codeOf(order.getStatus()).getValue());
 
         orderVo.setShippingId(order.getShippingId());
+        orderVo.setImageHost(PropertiesUtil.getProperty("file.prefix"));
         if(order.getShippingId()!=null) {
-        	Shipping shipping = shippings.findById(order.getShippingId()).get();
+        	Optional<Shipping> optionalShipping = shippings.findById(order.getShippingId());
+        	Shipping shipping = optionalShipping.isEmpty() ? null : optionalShipping.get();
         	if(shipping != null){
                 orderVo.setReceiverName(shipping.getReceiverName());
                 orderVo.setShippingVo(assembleShippingVo(shipping));
@@ -159,7 +162,7 @@ public class OrderService {
         return orderVo;
 	}
 
-	private OrderItemVo assembleOrderItemVo(OrderItem orderItem) {
+	public OrderItemVo assembleOrderItemVo(OrderItem orderItem) {
 		OrderItemVo orderItemVo = new OrderItemVo();
         orderItemVo.setOrderNo(orderItem.getOrderNo());
         orderItemVo.setProductId(orderItem.getProductId());
@@ -197,9 +200,12 @@ public class OrderService {
             }else{
                 orderItemList = orderItems.findByOrderNoAndUserId(order.getOrderNo(),userId);
             }
+//            System.out.println("orderNo:"+order.getOrderNo());
             OrderVo orderVo = assembleOrderVo(order,orderItemList);
             orderVoList.add(orderVo);
         }
         return orderVoList;
     }
+	
+	
 }

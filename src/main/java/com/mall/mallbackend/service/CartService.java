@@ -13,6 +13,7 @@ import com.mall.mallbackend.model.Product;
 import com.mall.mallbackend.repository.CartRepository;
 import com.mall.mallbackend.repository.ProductRepository;
 import com.mall.mallbackend.util.BigDecimalUtil;
+import com.mall.mallbackend.util.PropertiesUtil;
 import com.mall.mallbackend.vo.CartProductVo;
 import com.mall.mallbackend.vo.CartVo;
 @Controller
@@ -79,7 +80,7 @@ public class CartService {
         cartVo.setCartTotalPrice(cartTotalPrice);
         cartVo.setCartProductVoList(cartProductVoList);
         cartVo.setAllChecked(this.getAllCheckedStatus(userId));
-//        cartVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix"));
+        cartVo.setImageHost(PropertiesUtil.getProperty("file.prefix"));
 
         return cartVo;
 	}

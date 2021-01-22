@@ -1,8 +1,11 @@
 package com.mall.mallbackend.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.mall.mallbackend.common.Const;
 import com.mall.mallbackend.common.PageInfo;
@@ -25,6 +29,9 @@ import com.mall.mallbackend.model.User;
 import com.mall.mallbackend.repository.ProductRepository;
 import com.mall.mallbackend.service.ProductService;
 import com.mall.mallbackend.service.UserService;
+import com.mall.mallbackend.service.storage.StorageProperties;
+import com.mall.mallbackend.service.storage.StorageService;
+import com.mall.mallbackend.util.PropertiesUtil;
 import com.mall.mallbackend.vo.ProductDetailVo;
 import com.mall.mallbackend.vo.ProductListVo;
 
@@ -34,10 +41,15 @@ public class ProductManageController {
 	private final ProductRepository products;
 	private final UserService userService;
 	private final ProductService productService;
-	public ProductManageController(ProductRepository products, UserService userService, ProductService productService) {
+	private final StorageService storageService;
+	private final StorageProperties properties;
+	public ProductManageController(ProductRepository products, UserService userService, 
+			ProductService productService, StorageService storageService, StorageProperties properties) {
 		this.products = products;
 		this.userService = userService;
 		this.productService = productService;
+		this.storageService = storageService;
+		this.properties = properties;
 	}
 	
 	@PostMapping("list.do")
@@ -154,6 +166,26 @@ public class ProductManageController {
         }else{
             return ServerResponse.createByErrorMessage("无权限操作");
         }
+	}
+	
+	@PostMapping("upload.do")
+	public ServerResponse upload(HttpSession session,
+			@RequestParam(value = "upload_file",required = false) MultipartFile file) {
+//		String path = request.getSession().getServletContext().getRealPath("upload");
+//        String targetFileName = iFileService.upload(file,path);
+//        String url = PropertiesUtil.getProperty("ftp.server.http.prefix")+targetFileName;
+//
+//        Map fileMap = Maps.newHashMap();
+//        fileMap.put("uri",targetFileName);
+//        fileMap.put("url",url);
+//        return ServerResponse.createBySuccess(fileMap);
+		
+		String uploadFileName = storageService.store(file);
+		String url = this.properties.getPrefix() + uploadFileName;
+		Map<String, String> fileMap = new HashMap<>();
+		fileMap.put("uri",uploadFileName);
+        fileMap.put("url",url);
+        return ServerResponse.createBySuccess(fileMap);
 	}
 	
 	@PostMapping("save.do")

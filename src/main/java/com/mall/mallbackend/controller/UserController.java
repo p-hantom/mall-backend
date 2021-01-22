@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mall.mallbackend.common.Const;
+import com.mall.mallbackend.common.ResponseCode;
 import com.mall.mallbackend.common.ServerResponse;
 import com.mall.mallbackend.model.User;
 import com.mall.mallbackend.repository.UserRepository;
@@ -49,7 +50,8 @@ public class UserController {
 	}
 	
 	@PostMapping(path="/register.do")
-	public ServerResponse<User> register( User user
+	public ServerResponse<User> register( User user,
+			HttpSession session
 //			@RequestParam(value="username") String username, 
 //			@RequestParam(value="password") String password,
 //			@RequestParam(value="email") String email,
@@ -62,12 +64,13 @@ public class UserController {
             return validResponse;
         }
         
-        validResponse = this.checkValid(user.getEmail(),Const.EMAIL);
-        if(!validResponse.isSuccess()){
-            return validResponse;
-        }
-        user.setRole(Const.Role.ROLE_CUSTOMER);
+//        -> check valid email
+//        validResponse = this.checkValid(user.getEmail(),Const.EMAIL);
+//        if(!validResponse.isSuccess()){
+//            return validResponse;
+//        }
         
+        user.setRole(Const.Role.ROLE_CUSTOMER);
         //MD5加密
 		user.setPassword(DigestUtils.md5DigestAsHex(user.getPassword().getBytes()));
 		
@@ -75,7 +78,27 @@ public class UserController {
 		if(insertResult == null) {
 			return ServerResponse.createByErrorMessage("Registration failed");
 		}
+		session.setAttribute(Const.CURRENT_USER, user);
 		return ServerResponse.createBySuccessMessage("Registration succeeded");		
+	}
+	
+	// Not used???
+	@PostMapping(path="/check_valid.do")
+	public ServerResponse<String> checkValidUser(
+			@RequestParam(value="str") String str,
+			@RequestParam(value="type") String type) {
+		return checkValid(str, type);
+	}
+	
+	@PostMapping(path="/get_user_info.do")
+	public ServerResponse<User> getUserInfo(HttpSession session) {
+		User user = (User)session.getAttribute(Const.CURRENT_USER);
+		
+		if(user == null) {
+			return ServerResponse.createByErrorMessage("User not logged in, cannot get user info.");
+		}
+		System.out.println(user.getUsername());
+		return ServerResponse.createBySuccess("Signup succeeded",user);
 	}
 	
 	public ServerResponse<String> checkValid(String str, String type){
@@ -86,12 +109,12 @@ public class UserController {
 					return ServerResponse.createByErrorMessage("User already exists!");
 				}
 			}
-			if(Const.EMAIL.equals(type)) {
-				Integer count = users.countByEmail(str);
-				if(count > 0) {
-					return ServerResponse.createByErrorMessage("Email already exists!");
-				}
-			}
+//			if(Const.EMAIL.equals(type)) {
+//				Integer count = users.countByEmail(str);
+//				if(count > 0) {
+//					return ServerResponse.createByErrorMessage("Email already exists!");
+//				}
+//			}
 		} else{
             return ServerResponse.createByErrorMessage("Wrong parameters");
         }

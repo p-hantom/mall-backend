@@ -1,6 +1,7 @@
 package com.mall.mallbackend.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -29,6 +30,10 @@ import com.mall.mallbackend.repository.OrderRepository;
 import com.mall.mallbackend.repository.ProductRepository;
 import com.mall.mallbackend.repository.ShippingRepository;
 import com.mall.mallbackend.service.OrderService;
+import com.mall.mallbackend.util.BigDecimalUtil;
+import com.mall.mallbackend.util.PropertiesUtil;
+import com.mall.mallbackend.vo.OrderItemVo;
+import com.mall.mallbackend.vo.OrderProductVo;
 import com.mall.mallbackend.vo.OrderVo;
 import com.mall.mallbackend.vo.ProductListVo;
 
@@ -51,18 +56,18 @@ public class OrderController {
 	}
 	
 	@PostMapping(path="/create.do")
-	public ServerResponse create(HttpSession session, Integer shippingId){
+	public ServerResponse create(HttpSession session,@RequestParam(value="shippingId") Integer shippingId){
         User user = (User)session.getAttribute(Const.CURRENT_USER);
         if(user ==null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         Integer userId = user.getId();
         if(shippingId == null){
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+//            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         
         // Find cart list by userId
-        List<Cart> cartList = carts.findByUserId(userId);
+        List<Cart> cartList = carts.selectCheckedCartByUserId(userId);
         
         ServerResponse<List<OrderItem> > serverResponse = orderService.getCartOrderItem(userId,cartList);
         if(!serverResponse.isSuccess()){
@@ -105,7 +110,6 @@ public class OrderController {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         Integer userId = user.getId();
-        System.out.println(userId);
         
         Pageable paging = PageRequest.of(pageNum, pageSize, Sort.unsorted());;
 		PageInfo<Order, OrderVo> pageInfo;
@@ -122,12 +126,37 @@ public class OrderController {
         }
 	}
 	
-//	@PostMapping(path="/get_order_cart_product.do")
-//	public ServerResponse getOrderCartProduct(HttpSession session) {
-//		User user = (User)session.getAttribute(Const.CURRENT_USER);
-//        if(user ==null){
-//            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
-//        }
-//        Integer userId = user.getId();
-//	}
+	@PostMapping(path="/get_order_cart_product.do")
+	public ServerResponse getOrderCartProduct(HttpSession session) {
+		User user = (User)session.getAttribute(Const.CURRENT_USER);
+        if(user ==null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+        }
+        Integer userId = user.getId();
+        List<Cart> cartList = carts.selectCheckedCartByUserId(userId);
+        
+        ServerResponse<List<OrderItem> > serverResponse = orderService.getCartOrderItem(userId,cartList);
+        if(!serverResponse.isSuccess()){
+            return serverResponse;
+        }
+        List<OrderItem> orderItemList = serverResponse.getData();
+        BigDecimal payment = orderService.getOrderTotalPrice(orderItemList);
+        
+        System.out.println("orderItemList size: "+orderItemList.size());
+        System.out.println("payment:"+payment);
+        
+        if(orderItemList.isEmpty()) {
+        	return ServerResponse.createByErrorMessage("购物车为空");
+        }
+        
+        List<OrderItemVo> orderItemVoList = new ArrayList<>();
+        OrderProductVo orderProductVo = new OrderProductVo();
+        for(OrderItem orderItem : orderItemList){
+            orderItemVoList.add(orderService.assembleOrderItemVo(orderItem));
+        }
+        orderProductVo.setProductTotalPrice(payment);
+        orderProductVo.setOrderItemVoList(orderItemVoList);
+        orderProductVo.setImageHost(PropertiesUtil.getProperty("file.prefix"));
+        return ServerResponse.createBySuccess(orderProductVo);
+	}
 }

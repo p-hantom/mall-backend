@@ -20,6 +20,10 @@ public interface CartRepository extends PagingAndSortingRepository<Cart, Integer
 	@Transactional(readOnly = true)
 	Long selectCartProductCheckedStatusByUserId(@Param("userId") Integer userId);
 
+	@Query("SELECT new Cart(c.id,c.userId,c.productId,c.quantity,c.checked,c.createTime,c.updateTime) FROM Cart c WHERE c.userId=:userId AND c.checked=1 AND c.quantity>0")
+	@Transactional(readOnly = true)
+	List<Cart> selectCheckedCartByUserId(@Param("userId") Integer userId);
+	
 	Optional<Cart> findByUserIdAndProductId(Integer userId, Integer productId);
 
 	@Transactional
@@ -38,4 +42,5 @@ public interface CartRepository extends PagingAndSortingRepository<Cart, Integer
 	@Transactional
 	@Query("UPDATE Cart c SET c.checked=0 WHERE c.userId=:userId")
 	void updateAllUnchecked(Integer userId);
+
 }

@@ -26,6 +26,7 @@ import com.mall.mallbackend.model.Product;
 import com.mall.mallbackend.repository.CategoryRepository;
 import com.mall.mallbackend.repository.ProductRepository;
 import com.mall.mallbackend.service.CategoryService;
+import com.mall.mallbackend.util.PropertiesUtil;
 import com.mall.mallbackend.vo.ProductDetailVo;
 import com.mall.mallbackend.vo.ProductListVo;
 
@@ -70,14 +71,15 @@ public class ProductController {
 	          @RequestParam(value = "pageNum",defaultValue = "0") int pageNum,
 	          @RequestParam(value = "pageSize",defaultValue = "10") int pageSize,
 	          @RequestParam(value = "orderBy",defaultValue = "") String orderBy) {
-		
+		System.out.println("keyword:"
+				+ ""+keyword);
 		Pageable paging;
 		PageInfo<Product, ProductListVo> pageInfo;
 		Page<Product> pagedResult;
 		List<Integer> categoryIdList = new ArrayList<>();
 		
 		// Order by
-		if(orderBy == ""){
+		if(orderBy.equals("")){
 			paging = PageRequest.of(pageNum, pageSize, Sort.unsorted());
         } else {
 			paging = PageRequest.of(pageNum, pageSize, Sort.by(orderBy));
@@ -106,7 +108,7 @@ public class ProductController {
 			}
 			
 			// Assemble as PageInfo
-			pageInfo = new PageInfo(pagedResult, productListVoList, orderBy);
+			pageInfo = new PageInfo<Product, ProductListVo>(pagedResult, productListVoList, orderBy);
 			
 			return ServerResponse.createBySuccess(pageInfo);
         } else {
@@ -147,7 +149,7 @@ public class ProductController {
         productListVo.setId(product.getId());
         productListVo.setName(product.getName());
         productListVo.setCategoryId(product.getCategoryId());
-//        productListVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix","http://img.happymmall.com/"));
+        productListVo.setImageHost(PropertiesUtil.getProperty("file.prefix","http://img.happymmall.com/"));
         productListVo.setMainImage(product.getMainImage());
         productListVo.setPrice(product.getPrice());
         productListVo.setSubtitle(product.getSubtitle());
