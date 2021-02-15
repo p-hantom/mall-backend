@@ -11,5 +11,7 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	User findByUsernameAndPassword(String username, String md5Pass);
 
 	Integer countByEmail(String str);
+	
+	long count();
 
 }

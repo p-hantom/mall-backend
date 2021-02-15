@@ -35,12 +35,10 @@ import com.mall.mallbackend.vo.ProductListVo;
 @RequestMapping(path="/product")
 public class ProductController {
 	private final ProductRepository products;
-	private final CategoryRepository categoryRepository;
 	private final CategoryService categoryService;
 	
 	public ProductController(ProductRepository products,CategoryRepository categoryRepository) {
 		this.products = products;
-		this.categoryRepository = categoryRepository;
 		this.categoryService = new CategoryService(categoryRepository);
 	}
 	
@@ -65,7 +63,7 @@ public class ProductController {
 	}
 	
 	@PostMapping("list.do")
-    public ServerResponse<PageInfo> ProductByKeywordAndCategory(
+    public ServerResponse<PageInfo<Product, ProductListVo> > ProductByKeywordAndCategory(
     		  @RequestParam(value = "keyword",required = false)String keyword,
 	          @RequestParam(value = "categoryId",required = false)Integer categoryId,
 	          @RequestParam(value = "pageNum",defaultValue = "0") int pageNum,

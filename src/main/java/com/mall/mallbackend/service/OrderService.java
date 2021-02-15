@@ -6,15 +6,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 
 import com.mall.mallbackend.common.Const;
+import com.mall.mallbackend.common.PageInfo;
 import com.mall.mallbackend.common.ServerResponse;
 import com.mall.mallbackend.model.Cart;
 import com.mall.mallbackend.model.Order;
 import com.mall.mallbackend.model.OrderItem;
 import com.mall.mallbackend.model.Product;
 import com.mall.mallbackend.model.Shipping;
+import com.mall.mallbackend.model.User;
 import com.mall.mallbackend.repository.CartRepository;
 import com.mall.mallbackend.repository.OrderItemRepository;
 import com.mall.mallbackend.repository.OrderRepository;
@@ -207,5 +210,14 @@ public class OrderService {
         return orderVoList;
     }
 	
-	
+	public ServerResponse<PageInfo<Order, Order>> assembleOrderPageInfo(Page<Order> pagedResult) {
+		PageInfo<Order, Order> pageInfo;
+		if(pagedResult.hasContent()) {
+			pageInfo = new PageInfo(pagedResult, pagedResult.getContent(), "");
+			return ServerResponse.createBySuccess(pageInfo);
+		}
+		else {
+			return ServerResponse.createBySuccess(new PageInfo<Order, Order>());
+		}
+	}
 }

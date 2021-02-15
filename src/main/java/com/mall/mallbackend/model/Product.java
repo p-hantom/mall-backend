@@ -53,6 +53,7 @@ public class Product implements Serializable {
     private Integer status;
 
 	@Column(name = "create_time")
+	@NotEmpty
 	@CreationTimestamp
     private Date createTime;
 

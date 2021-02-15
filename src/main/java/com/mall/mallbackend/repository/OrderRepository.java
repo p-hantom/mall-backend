@@ -15,4 +15,5 @@ public interface OrderRepository extends PagingAndSortingRepository<Order, Integ
 
 	Page<Order> findByUserId(Integer userId, Pageable paging);
 
+	long count();
 }

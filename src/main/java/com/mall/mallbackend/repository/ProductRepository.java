@@ -40,4 +40,8 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, I
 	@Query("SELECT p FROM Product p WHERE p.name LIKE %:productName% OR p.id=:productId")
 	@Transactional(readOnly = true)
 	Page<Product> findByNameContainingAndId(@Param("productName") String productName,@Param("productId") Integer productId, Pageable pageable);
+
+	Page<Product> findAll(Pageable paging);
+	
+	long count();
 }

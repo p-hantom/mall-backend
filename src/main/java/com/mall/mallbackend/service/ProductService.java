@@ -53,7 +53,7 @@ public class ProductService {
         return productDetailVo;
     }
 	
-	public ServerResponse<PageInfo> assembleProductPageInfo(Page<Product> pagedResult){
+	public ServerResponse<PageInfo<Product, ProductListVo> > assembleProductPageInfo(Page<Product> pagedResult){
 		PageInfo<Product, ProductListVo> pageInfo;
 		List<ProductListVo> productListVoList = new ArrayList<>();
     	if(pagedResult.hasContent()) {
@@ -63,10 +63,10 @@ public class ProductService {
 	            productListVoList.add(productListVo);
 			}
 			// Assemble as PageInfo
-			pageInfo = new PageInfo(pagedResult, productListVoList, "");
+			pageInfo = new PageInfo<Product, ProductListVo>(pagedResult, productListVoList, "");
 			return ServerResponse.createBySuccess(pageInfo);
     	} else {
-        	System.out.println("empty list");
+        	System.out.println("empty list prd list");
         	return ServerResponse.createBySuccess(new PageInfo<Product, ProductListVo>());
         }
 	}

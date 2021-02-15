@@ -65,7 +65,7 @@ public class CartController {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         Optional<Cart> optionalCart = carts.findByUserIdAndProductId(userId, productId);
-        
+        System.out.println(count);
         if(optionalCart.isEmpty()){
             //这个产品不在这个购物车里,需要新增一个这个产品的记录
             Cart cartItem = new Cart();
@@ -73,6 +73,7 @@ public class CartController {
             cartItem.setChecked(Const.Cart.CHECKED);
             cartItem.setProductId(productId);
             cartItem.setUserId(userId);
+            
             carts.save(cartItem);
         }else{
             //这个产品已经在购物车里了.

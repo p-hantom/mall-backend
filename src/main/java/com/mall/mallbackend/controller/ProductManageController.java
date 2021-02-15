@@ -1,12 +1,8 @@
 package com.mall.mallbackend.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +27,6 @@ import com.mall.mallbackend.service.ProductService;
 import com.mall.mallbackend.service.UserService;
 import com.mall.mallbackend.service.storage.StorageProperties;
 import com.mall.mallbackend.service.storage.StorageService;
-import com.mall.mallbackend.util.PropertiesUtil;
 import com.mall.mallbackend.vo.ProductDetailVo;
 import com.mall.mallbackend.vo.ProductListVo;
 
@@ -53,7 +48,7 @@ public class ProductManageController {
 	}
 	
 	@PostMapping("list.do")
-    public ServerResponse<PageInfo> list(
+    public ServerResponse<PageInfo<Product, ProductListVo>> list(
     		HttpSession session,
     		@RequestParam(value = "pageNum",defaultValue = "0") int pageNum,
 	        @RequestParam(value = "pageSize",defaultValue = "10") int pageSize) {
@@ -62,10 +57,10 @@ public class ProductManageController {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录,请登录管理员");
         }
         if(userService.checkAdminRole(user).isSuccess()){
-            //填充业务
         	Pageable paging;
         	paging = PageRequest.of(pageNum, pageSize, Sort.unsorted());
         	// Find in database
+        	
         	Page<Product> pagedResult = products.findAll(paging);
         	
         	return productService.assembleProductPageInfo(pagedResult);
@@ -75,7 +70,7 @@ public class ProductManageController {
 	}
 	
 	@PostMapping("search.do")
-    public ServerResponse<PageInfo> productSearch(
+    public ServerResponse<PageInfo<Product, ProductListVo>> productSearch(
     		HttpSession session,
     		@RequestParam(value = "productName",required=false) String productName,
     		@RequestParam(value = "productId",required=false) Integer productId,
