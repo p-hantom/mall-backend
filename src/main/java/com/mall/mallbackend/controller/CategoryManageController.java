@@ -54,6 +54,20 @@ public class CategoryManageController {
             return ServerResponse.createByErrorMessage("无权限操作");
         }
 	}
+	@PostMapping("get_category_list.do")
+	public ServerResponse<List<Category>> getCategoryList(HttpSession session) {
+		User user = (User)session.getAttribute(Const.CURRENT_USER);
+        if(user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录,请登录管理员");
+        }
+        if(userService.checkAdminRole(user).isSuccess()){
+            //填充业务
+        	List<Category> categoryList = (List<Category>) categorys.findAll();
+        	return ServerResponse.createBySuccess(categoryList);
+        }else{
+            return ServerResponse.createByErrorMessage("无权限操作");
+        }
+	}
 	@PostMapping("get_deep_category.do")
 	public ServerResponse<List<Integer>> getCategoryAndDeepChildrenCategory(HttpSession session,
 				@RequestParam(value = "categoryId") Integer categoryId) {

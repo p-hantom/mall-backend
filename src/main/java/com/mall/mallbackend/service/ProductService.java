@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import com.mall.mallbackend.common.PageInfo;
 import com.mall.mallbackend.common.ServerResponse;
 import com.mall.mallbackend.model.Product;
+import com.mall.mallbackend.util.PropertiesUtil;
 import com.mall.mallbackend.vo.ProductDetailVo;
 import com.mall.mallbackend.vo.ProductListVo;
 @Controller
@@ -39,7 +40,7 @@ public class ProductService {
         productDetailVo.setStatus(product.getStatus());
         productDetailVo.setStock(product.getStock());
 
-//        productDetailVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix","http://img.happymmall.com/"));
+        productDetailVo.setImageHost(PropertiesUtil.getProperty("file.prefix"));
 //
 //        Category category = categoryMapper.selectByPrimaryKey(product.getCategoryId());
 //        if(category == null){

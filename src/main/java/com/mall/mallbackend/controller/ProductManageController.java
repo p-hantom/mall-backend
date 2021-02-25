@@ -1,5 +1,6 @@
 package com.mall.mallbackend.controller;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -138,6 +139,8 @@ public class ProductManageController {
 	public ServerResponse<String> setSaleStatus(HttpSession session,
     		@RequestParam(value = "productId") Integer productId,
     		@RequestParam(value = "status") Integer status) {
+		System.out.println("productId:"+ productId);
+		System.out.println("status:"+ status);
 		User user = (User)session.getAttribute(Const.CURRENT_USER);
         if(user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录,请登录管理员");
@@ -186,14 +189,6 @@ public class ProductManageController {
 	@PostMapping("save.do")
 	public ServerResponse<String> saveOrUpdataProduct(HttpSession session,
 			Product product
-//    		@RequestParam(value = "productId") Integer productId,
-//    		@RequestParam(value = "categoryId") Integer categoryId,
-//    		@RequestParam(value = "name") String name,
-//    		@RequestParam(value = "subtitle") String subtitle,
-//    		@RequestParam(value = "mainImage") String mainImage,
-//    		@RequestParam(value = "subImages") String subImages,
-//    		@RequestParam(value = "detail") String detail,
-//    		@RequestParam(value = "status") Integer status
     		) {
 		User user = (User)session.getAttribute(Const.CURRENT_USER);
         if(user == null){
@@ -203,12 +198,12 @@ public class ProductManageController {
             //填充业务
         	if(product != null)
             {
-                if(StringUtils.isNotBlank(product.getSubImages())){
-                    String[] subImageArray = product.getSubImages().split(",");
-                    if(subImageArray.length > 0){
-                        product.setMainImage(subImageArray[0]);
-                    }
-                }
+//                if(StringUtils.isNotBlank(product.getSubImages())){
+//                    String[] subImageArray = product.getSubImages().split(",");
+//                    if(subImageArray.length > 0){
+//                        product.setMainImage(subImageArray[0]);
+//                    }
+//                }
                 
                 Product savedProduct = products.save(product);
                 if(savedProduct!=null) {
@@ -221,4 +216,5 @@ public class ProductManageController {
             return ServerResponse.createByErrorMessage("无权限操作");
         }
 	}
+	
 }
